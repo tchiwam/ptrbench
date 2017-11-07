@@ -20,6 +20,8 @@ endif()
 include_directories("${PROJECT_BINARY_DIR}"
                     "${PROJECT_SOURCE_DIR}/include")
 
-add_executable(benchmark benchmark/benchmark.c)
-target_link_libraries(benchmark ptrtimer)
+add_executable(benchfloat benchmark/float.c)
+add_executable(benchcast  benchmark/cast.c)
+target_link_libraries(benchfloat ptrtimer)
+target_link_libraries(benchcast ptrtimer)
 
