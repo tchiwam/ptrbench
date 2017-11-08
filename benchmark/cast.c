@@ -2,19 +2,19 @@
 #include<stdlib.h>
 #include<stdio.h>
 
-#define TOTALSIZE 512000000*2
+#define TOTALSIZE 1024000000*2
 // 4k=12 8k=13 16k=14 32k=15 64k=16 128k=17 256k=18 512k=19 
 // 1M=20 2M=21 4M=22 8M=23 16M=24 32M=25 64M=26 128M=27 256M=28 512M=29 
 // 1G=30
 #define LOOPMIN 1 << 14 
-#define LOOPMAX 1 << 26
+#define LOOPMAX 1 << 29
 #define THREADMIN 1
 #define THREADMAX 8
 main()
 {
 // Generic variables
 long i,j,k,ilim;
-long loopmin = LOOPMIN, loopmax = LOOPMAX , loopsize;
+long long loopmin = LOOPMIN, loopmax = LOOPMAX , loopsize;
 float *x;
 unsigned char  *a;
 unsigned short *b;
@@ -26,16 +26,16 @@ t0 = ptrtimer_init(10);
 
 // Adjust the loop parameters
 loopsize = (TOTALSIZE/sizeof(float))/3;
-printf("Total memory allocated %ld Mbytes\n",loopsize*3*sizeof(float)/(1024*1024));
-printf("Loop size              %ld Mfloats\n",loopsize/(1024*1024));
+printf("Total memory allocated %lld Mbytes\n",loopsize*3*sizeof(float)/(1024*1024));
+printf("Loop size              %lld Mfloats\n",loopsize/(1024*1024));
 
 if (loopmin > loopsize)
    loopmin = loopsize;
 if (loopmax > loopsize)
    loopmax = loopsize;
 
-printf("Loop min size          %ld floats\n",loopmin);
-printf("Loop max size          %ld floats\n",loopmax);
+printf("Loop min size          %lld floats\n",loopmin);
+printf("Loop max size          %lld floats\n",loopmax);
 
 // Allocate arrays
 x = malloc(loopsize*sizeof(float));
@@ -101,7 +101,7 @@ for (i = loopmin; i<loopsize; i=i << 1)
       }
       ptrtimer_stop(t0);
    }
-   printf("size=%ld rep=%ld Mcast/s=%4.3f MByte/s=%4.3f \n",i,loopsize/i,(double)i/ptrtimer_getavg(t0)*1.0/1000000.0,(double)i/ptrtimer_getavg(t0)*5.0/1000000.0);
+   printf("size=%ld rep=%lld Mcast/s=%4.3f MByte/s=%4.3f \n",i,loopsize/i,(double)i/ptrtimer_getavg(t0)*1.0/1000000.0,(double)i/ptrtimer_getavg(t0)*5.0/1000000.0);
    ptrtimer_reset(t0);
 }
 
@@ -117,7 +117,7 @@ for (i = loopmin; i<loopsize; i=i << 1)
       }
       ptrtimer_stop(t0);
    }
-   printf("size=%ld rep=%ld Mcast/s=%4.3f MByte/s=%4.3f \n",i,loopsize/i,(double)i/ptrtimer_getavg(t0)*1.0/1000000.0,(double)i/ptrtimer_getavg(t0)*6.0/1000000.0);
+   printf("size=%ld rep=%lld Mcast/s=%4.3f MByte/s=%4.3f \n",i,loopsize/i,(double)i/ptrtimer_getavg(t0)*1.0/1000000.0,(double)i/ptrtimer_getavg(t0)*6.0/1000000.0);
    ptrtimer_reset(t0);
 }
 
@@ -133,7 +133,7 @@ for (i = loopmin; i<loopsize; i=i << 1)
       }
       ptrtimer_stop(t0);
    }
-   printf("size=%ld rep=%ld Mcast/s=%4.3f MByte/s=%4.3f \n",i,loopsize/i,(double)i/ptrtimer_getavg(t0)*1.0/1000000.0,(double)i/ptrtimer_getavg(t0)*8.0/1000000.0);
+   printf("size=%ld rep=%lld Mcast/s=%4.3f MByte/s=%4.3f \n",i,loopsize/i,(double)i/ptrtimer_getavg(t0)*1.0/1000000.0,(double)i/ptrtimer_getavg(t0)*8.0/1000000.0);
    ptrtimer_reset(t0);
 }
 
@@ -149,7 +149,7 @@ for (i = loopmin; i<loopsize; i=i << 1)
       }
       ptrtimer_stop(t0);
    }
-   printf("size=%ld rep=%ld Mcast/s=%4.3f MByte/s=%4.3f \n",i,loopsize/i,(double)i/ptrtimer_getavg(t0)*1.0/1000000.0,(double)i/ptrtimer_getavg(t0)*5.0/1000000.0);
+   printf("size=%ld rep=%lld Mcast/s=%4.3f MByte/s=%4.3f \n",i,loopsize/i,(double)i/ptrtimer_getavg(t0)*1.0/1000000.0,(double)i/ptrtimer_getavg(t0)*5.0/1000000.0);
    ptrtimer_reset(t0);
 }
 
@@ -165,7 +165,7 @@ for (i = loopmin; i<loopsize; i=i << 1)
       }
       ptrtimer_stop(t0);
    }
-   printf("size=%ld rep=%ld Mcast/s=%4.3f MByte/s=%4.3f \n",i,loopsize/i,(double)i/ptrtimer_getavg(t0)*1.0/1000000.0,(double)i/ptrtimer_getavg(t0)*6.0/1000000.0);
+   printf("size=%ld rep=%lld Mcast/s=%4.3f MByte/s=%4.3f \n",i,loopsize/i,(double)i/ptrtimer_getavg(t0)*1.0/1000000.0,(double)i/ptrtimer_getavg(t0)*6.0/1000000.0);
    ptrtimer_reset(t0);
 }
 
@@ -181,7 +181,7 @@ for (i = loopmin; i<loopsize; i=i << 1)
       }
       ptrtimer_stop(t0);
    }
-   printf("size=%ld rep=%ld Mcast/s=%4.3f MByte/s=%4.3f \n",i,loopsize/i,(double)i/ptrtimer_getavg(t0)*1.0/1000000.0,(double)i/ptrtimer_getavg(t0)*5.0/1000000.0);
+   printf("size=%ld rep=%lld Mcast/s=%4.3f MByte/s=%4.3f \n",i,loopsize/i,(double)i/ptrtimer_getavg(t0)*1.0/1000000.0,(double)i/ptrtimer_getavg(t0)*5.0/1000000.0);
    ptrtimer_reset(t0);
 }
 
@@ -193,14 +193,49 @@ for (i = loopmin; i<loopsize; i=i << 1)
       ptrtimer_start(t0);
       for (k=0;k<i;k++)
       {
-         x[k]=(float)b[k]*0.1*3.2;
+         x[k]=(float)b[k]*0.1+3.2;
       }
       ptrtimer_stop(t0);
    }
-   printf("size=%ld rep=%ld Mcast/s=%4.3f MByte/s=%4.3f \n",i,loopsize/i,(double)i/ptrtimer_getavg(t0)*1.0/1000000.0,(double)i/ptrtimer_getavg(t0)*6.0/1000000.0);
+   printf("size=%ld rep=%lld Mcast/s=%4.3f MByte/s=%4.3f \n",i,loopsize/i,(double)i/ptrtimer_getavg(t0)*1.0/1000000.0,(double)i/ptrtimer_getavg(t0)*6.0/1000000.0);
    ptrtimer_reset(t0);
 }
 
+printf("lu8 cast unsigned char to float mx+b\n");
+for (i = loopmin; i<loopsize; i=i << 1)
+{
+   for (j=0;j<loopsize/i;j++)
+   {
+      ptrtimer_start(t0);
+      for(k=0;k<(1<<8);k++)
+         lu8[k] = lu8[k]*0.1+3.2;
+      for (k=0;k<i;k++)
+      {
+         x[k]=lu8[a[k]];
+      }
+      ptrtimer_stop(t0);
+   }
+   printf("size=%ld rep=%lld Mcast/s=%4.3f MByte/s=%4.3f \n",i,loopsize/i,(double)i/ptrtimer_getavg(t0)*1.0/1000000.0,(double)i/ptrtimer_getavg(t0)*5.0/1000000.0);
+   ptrtimer_reset(t0);
+}
+
+printf("lu16 cast unsigned short to float mx+b\n");
+for (i = loopmin; i<loopsize; i=i << 1)
+{
+   for (j=0;j<loopsize/i;j++)
+   {
+      ptrtimer_start(t0);
+      for(k=0;k<(1<<16);k++)
+         lu16[k] = lu16[k]*0.1+3.2;
+      for (k=0;k<i;k++)
+      {
+         x[k]=lu16[b[k]];
+      }
+      ptrtimer_stop(t0);
+   }
+   printf("size=%ld rep=%lld Mcast/s=%4.3f MByte/s=%4.3f \n",i,loopsize/i,(double)i/ptrtimer_getavg(t0)*1.0/1000000.0,(double)i/ptrtimer_getavg(t0)*6.0/1000000.0);
+   ptrtimer_reset(t0);
+}
 
 ptrtimer_close(t0);
 

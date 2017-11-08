@@ -1,7 +1,13 @@
 A Simple bench mark to try find the limits of cache versus flops speed.
 
+benchfloat:
+
 For example many very fast vector processors can handle a stream of 2 ops (1 muladd) per main memory fetch
 While intel processors can do up to 20 ops per main memory fetch.
+
+benchcast:
+
+Find the best way for you to convert int8 and int16 into floating point. On some processors and compiler combination, the casting can be very expensive
 
 This can help you to divide some functions in stages of no more than N ops per memory fetch and keep all in the inner cache While another thread is fetching and preparing the stream to be processed.
 
