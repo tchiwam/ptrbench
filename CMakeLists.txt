@@ -14,7 +14,10 @@ if (DEFINED ENV{dir_base})
         include_directories("$ENV{dir_base}/include")
         link_directories("$ENV{dir_base}/lib")
 else()
-	message("dir_base is not defined")
+	     include_directories("${CMAKE_INSTALL_PREFIX}/include")
+             link_directories("${CMAKE_INSTALL_PREFIX}/lib")
+	     message("dir_base is not defined using CMAKE_INSTALL_PREFIX for
+	     headers")
 endif()
 
 include_directories("${PROJECT_BINARY_DIR}"
