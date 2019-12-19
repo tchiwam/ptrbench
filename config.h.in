@@ -1,2 +1,6 @@
-#define ptrtimer_VERSION_MAJOR @Tutorial_VERSION_MAJOR@
-#define ptrtimer_VERSION_MINOR @Tutorial_VERSION_MINOR@
+#define ptrbench_VERSION_MAJOR @ptrbench_VERSION_MAJOR@
+#define ptrbench_VERSION_MINOR @ptrbench_VERSION_MINOR@
+#define ptrbench_C_COMPILER_ID @ptrbench_C_COMPILER_ID@
+#define ptrbench_C_COMPILER_VERSION @ptrbench_C_COMPILER_VERSION@
+#define ptrbench_CFLAGS @ptrbench_CFLAGS@
+

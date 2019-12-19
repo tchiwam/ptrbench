@@ -1,6 +1,7 @@
 #include<ptrtimer.h>
 #include<stdlib.h>
 #include<stdio.h>
+#include<config.h>
 
 #define TOTALSIZE 4096000000
 // 4k=12 8k=13 16k=14 32k=15 64k=16 128k=17 256k=18 512k=19 
@@ -19,6 +20,10 @@ float *x,*a,*b;
 
 ptrtimer *t0;
 t0 = ptrtimer_init(10);
+
+
+printf("Compiler " ptrbench_C_COMPILER_ID "\n Version " ptrbench_C_COMPILER_VERSION "\n CFLAGS " ptrbench_CFLAGS "\n");
+
 
 // Adjust the loop parameters
 loopsize = (TOTALSIZE/sizeof(float))/3;
