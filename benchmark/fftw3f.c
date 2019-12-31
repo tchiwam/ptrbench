@@ -89,6 +89,33 @@ for (i = loopmin; i<loopsize; i=i << 1)
    printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n",i,loopsize/i,(5*(double)i*log2((double)i))/ptrtimer_getavg(t0)/1000000.0,(double)i/ptrtimer_getavg(t0)*32.0/1000000.0);
    ptrtimer_reset(t0);
 }
+
+printf("1d dft comple float 32 in place\n");
+ptrtimer_reset(t0);
+for (i = loopmin; i<loopsize; i=i << 1)
+{
+   p = fftwf_plan_dft_1d(i, a, a, FFTW_FORWARD, FFTW_MEASURE);
+   for (j=0;j<loopsize/i;j++)
+   {
+      for  (k=0 ; k<i; k++)
+      {
+         a[k][0] = (float)k/loopsize;
+         a[k][1] = (float)k/loopsize;
+      }
+      ptrtimer_start(t0);
+      fftwf_execute(p); /* repeat as needed */
+      ptrtimer_stop(t0);
+   }
+   fftwf_destroy_plan(p);
+   printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n",i,loopsize/i,(5*(double)i*log2((double)i))/ptrtimer_getavg(t0)/1000000.0,(double)i/ptrtimer_getavg(t0)*32.0/1000000.0);
+   ptrtimer_reset(t0);
+}
+
+
+
+
+
+
 ptrtimer_close(t0);
 
 fftwf_free(b);

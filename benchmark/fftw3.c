@@ -69,7 +69,7 @@ if (b == NULL)
 ptrtimer_stop(t0);
 ptrtimer_report(t0);
 
-printf("1d dft comple float 32 out of place\n");
+printf("1d dft comple float 64 out of place\n");
 ptrtimer_reset(t0);
 for (i = loopmin; i<loopsize; i=i << 1)
 {
