@@ -10,7 +10,7 @@
 #define LOOPMAX 1 << 29
 #define THREADMIN 1
 #define THREADMAX 8
-main()
+int main()
 {
 // Generic variables
 long i,j,k,ilim;
