@@ -73,7 +73,7 @@ printf("1d dft comple float 64 out of place\n");
 ptrtimer_reset(t0);
 for (i = loopmin; i<loopsize; i=i << 1)
 {
-   p = fftw_plan_dft_1d(i, a, b, FFTW_FORWARD, FFTW_MEASURE);
+   p = fftw_plan_dft_1d(i, a, b, FFTW_FORWARD, FFTW_EXHAUSTIVE);
    for (j=0;j<loopsize/i;j++)
    {
       for  (k=0 ; k<i; k++)
@@ -86,7 +86,7 @@ for (i = loopmin; i<loopsize; i=i << 1)
       ptrtimer_stop(t0);
    }
    fftw_destroy_plan(p);
-   printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n",i,loopsize/i,(5*(double)i*log2((double)i))/ptrtimer_getavg(t0)/1000000.0,(double)i/ptrtimer_getavg(t0)*32.0/1000000.0);
+   printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n",i,loopsize/i,(5*(double)i*log2((double)i))/ptrtimer_getavg(t0)/1000000.0,(double)i/ptrtimer_getavg(t0)*2*sizeof(fftw_complex)/1000000.0);
    ptrtimer_reset(t0);
 }
 
