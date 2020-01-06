@@ -8,7 +8,7 @@
 // 1M=20 2M=21 4M=22 8M=23 16M=24 32M=25 64M=26 128M=27 256M=28 512M=29 
 // 1G=30
 #define LOOPMIN 1 << 12 
-#define LOOPMAX 1 << 29
+#define LOOPMAX 1 << 30
 #define THREADMIN 1
 #define THREADMAX 8
 int main()
