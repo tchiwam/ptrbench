@@ -1,0 +1,152 @@
+Compiler GNU
+ Version 9.2.0
+ CFLAGS -Ofast -march=native -funroll-all-loops -mavx -mavx2
+Total memory allocated 3906 Mbytes
+Loop size              325 Mfloats
+Loop min size          4096 floats
+Loop max size          341333333 floats
+min:1.303537 max:1.303537 avg:1.303537 count: 1 
+1flop 1xfloat
+size=4096 rep=83333 Mflop/s=3825.707 MByte/s=15302.829 
+size=8192 rep=41666 Mflop/s=3875.228 MByte/s=15500.914 
+size=16384 rep=20833 Mflop/s=3899.775 MByte/s=15599.099 
+size=32768 rep=10416 Mflop/s=3915.751 MByte/s=15663.005 
+size=65536 rep=5208 Mflop/s=3920.411 MByte/s=15681.646 
+size=131072 rep=2604 Mflop/s=3922.899 MByte/s=15691.597 
+size=262144 rep=1302 Mflop/s=3918.144 MByte/s=15672.578 
+size=524288 rep=651 Mflop/s=3915.686 MByte/s=15662.742 
+size=1048576 rep=325 Mflop/s=3915.160 MByte/s=15660.638 
+size=2097152 rep=162 Mflop/s=3867.059 MByte/s=15468.236 
+size=4194304 rep=81 Mflop/s=3509.127 MByte/s=14036.510 
+size=8388608 rep=40 Mflop/s=3019.490 MByte/s=12077.962 
+size=16777216 rep=20 Mflop/s=3011.226 MByte/s=12044.903 
+size=33554432 rep=10 Mflop/s=3012.855 MByte/s=12051.418 
+size=67108864 rep=5 Mflop/s=3014.122 MByte/s=12056.488 
+size=134217728 rep=2 Mflop/s=3020.199 MByte/s=12080.797 
+size=268435456 rep=1 Mflop/s=3007.618 MByte/s=12030.473 
+1flop 2xfloat
+size=4096 rep=83333 Mflops=3812.210 MByte/s=30497.684 
+size=8192 rep=41666 Mflops=3869.118 MByte/s=30952.943 
+size=16384 rep=20833 Mflops=3897.385 MByte/s=31179.084 
+size=32768 rep=10416 Mflops=3911.895 MByte/s=31295.162 
+size=65536 rep=5208 Mflops=3918.534 MByte/s=31348.274 
+size=131072 rep=2604 Mflops=3891.735 MByte/s=31133.879 
+size=262144 rep=1302 Mflops=3891.278 MByte/s=31130.224 
+size=524288 rep=651 Mflops=3894.994 MByte/s=31159.948 
+size=1048576 rep=325 Mflops=3900.001 MByte/s=31200.005 
+size=2097152 rep=162 Mflops=3283.448 MByte/s=26267.581 
+size=4194304 rep=81 Mflops=2666.459 MByte/s=21331.668 
+size=8388608 rep=40 Mflops=2656.209 MByte/s=21249.673 
+size=16777216 rep=20 Mflops=2698.921 MByte/s=21591.369 
+size=33554432 rep=10 Mflops=2725.172 MByte/s=21801.379 
+size=67108864 rep=5 Mflops=2695.382 MByte/s=21563.056 
+size=134217728 rep=2 Mflops=2671.088 MByte/s=21368.700 
+size=268435456 rep=1 Mflops=2767.571 MByte/s=22140.567 
+1flop 3xfloat
+size=4096 rep=83333 Mflops=8187.385 MByte/s=98248.621 
+size=8192 rep=41666 Mflops=8036.662 MByte/s=96439.950 
+size=16384 rep=20833 Mflops=8176.059 MByte/s=98112.708 
+size=32768 rep=10416 Mflops=7868.040 MByte/s=94416.486 
+size=65536 rep=5208 Mflops=6941.323 MByte/s=83295.873 
+size=131072 rep=2604 Mflops=6579.086 MByte/s=78949.030 
+size=262144 rep=1302 Mflops=6488.132 MByte/s=77857.578 
+size=524288 rep=651 Mflops=6347.360 MByte/s=76168.319 
+size=1048576 rep=325 Mflops=5185.558 MByte/s=62226.693 
+size=2097152 rep=162 Mflops=2188.371 MByte/s=26260.455 
+size=4194304 rep=81 Mflops=1918.215 MByte/s=23018.578 
+size=8388608 rep=40 Mflops=1919.161 MByte/s=23029.929 
+size=16777216 rep=20 Mflops=1921.094 MByte/s=23053.133 
+size=33554432 rep=10 Mflops=1923.016 MByte/s=23076.189 
+size=67108864 rep=5 Mflops=1920.732 MByte/s=23048.783 
+size=134217728 rep=2 Mflops=1923.739 MByte/s=23084.866 
+size=268435456 rep=1 Mflops=1903.954 MByte/s=22847.453 
+4flop 3xfloat
+size=4096 rep=83333 Mflops=10805.323 MByte/s=32415.969 
+size=8192 rep=41666 Mflops=11080.196 MByte/s=33240.589 
+size=16384 rep=20833 Mflops=11158.300 MByte/s=33474.901 
+size=32768 rep=10416 Mflops=10686.075 MByte/s=32058.226 
+size=65536 rep=5208 Mflops=10816.011 MByte/s=32448.033 
+size=131072 rep=2604 Mflops=10761.519 MByte/s=32284.557 
+size=262144 rep=1302 Mflops=10764.539 MByte/s=32293.617 
+size=524288 rep=651 Mflops=10733.487 MByte/s=32200.460 
+size=1048576 rep=325 Mflops=10274.307 MByte/s=30822.922 
+size=2097152 rep=162 Mflops=8254.978 MByte/s=24764.933 
+size=4194304 rep=81 Mflops=7738.312 MByte/s=23214.937 
+size=8388608 rep=40 Mflops=7745.586 MByte/s=23236.757 
+size=16777216 rep=20 Mflops=7758.652 MByte/s=23275.956 
+size=33554432 rep=10 Mflops=7764.834 MByte/s=23294.502 
+size=67108864 rep=5 Mflops=7757.091 MByte/s=23271.272 
+size=134217728 rep=2 Mflops=7751.943 MByte/s=23255.830 
+size=268435456 rep=1 Mflops=7750.153 MByte/s=23250.460 
+6flop 3xfloat
+size=4096 rep=83333 Mflops=14500.363 MByte/s=29000.727 
+size=8192 rep=41666 Mflops=14605.394 MByte/s=29210.788 
+size=16384 rep=20833 Mflops=14628.368 MByte/s=29256.736 
+size=32768 rep=10416 Mflops=14549.543 MByte/s=29099.086 
+size=65536 rep=5208 Mflops=14596.657 MByte/s=29193.315 
+size=131072 rep=2604 Mflops=14557.876 MByte/s=29115.752 
+size=262144 rep=1302 Mflops=14619.422 MByte/s=29238.844 
+size=524288 rep=651 Mflops=14592.853 MByte/s=29185.706 
+size=1048576 rep=325 Mflops=14211.742 MByte/s=28423.484 
+size=2097152 rep=162 Mflops=12406.800 MByte/s=24813.600 
+size=4194304 rep=81 Mflops=11425.460 MByte/s=22850.921 
+size=8388608 rep=40 Mflops=11351.524 MByte/s=22703.049 
+size=16777216 rep=20 Mflops=11354.259 MByte/s=22708.519 
+size=33554432 rep=10 Mflops=11369.773 MByte/s=22739.546 
+size=67108864 rep=5 Mflops=11351.678 MByte/s=22703.356 
+size=134217728 rep=2 Mflops=11358.584 MByte/s=22717.167 
+size=268435456 rep=1 Mflops=11372.696 MByte/s=22745.392 
+8flop 3xfloat
+size=4096 rep=83333 Mflops=18350.877 MByte/s=27526.315 
+size=8192 rep=41666 Mflops=18562.663 MByte/s=27843.994 
+size=16384 rep=20833 Mflops=18685.658 MByte/s=28028.486 
+size=32768 rep=10416 Mflops=18454.105 MByte/s=27681.157 
+size=65536 rep=5208 Mflops=18536.620 MByte/s=27804.929 
+size=131072 rep=2604 Mflops=18502.280 MByte/s=27753.420 
+size=262144 rep=1302 Mflops=18499.341 MByte/s=27749.012 
+size=524288 rep=651 Mflops=18501.387 MByte/s=27752.081 
+size=1048576 rep=325 Mflops=17626.196 MByte/s=26439.295 
+size=2097152 rep=162 Mflops=15297.601 MByte/s=22946.402 
+size=4194304 rep=81 Mflops=14437.303 MByte/s=21655.955 
+size=8388608 rep=40 Mflops=14488.272 MByte/s=21732.407 
+size=16777216 rep=20 Mflops=14511.448 MByte/s=21767.172 
+size=33554432 rep=10 Mflops=14534.606 MByte/s=21801.908 
+size=67108864 rep=5 Mflops=14547.408 MByte/s=21821.112 
+size=134217728 rep=2 Mflops=14491.110 MByte/s=21736.665 
+size=268435456 rep=1 Mflops=14581.548 MByte/s=21872.322 
+10flop 3xfloat
+size=4096 rep=83333 Mflops=20290.661 MByte/s=24348.793 
+size=8192 rep=41666 Mflops=20469.066 MByte/s=24562.879 
+size=16384 rep=20833 Mflops=20512.624 MByte/s=24615.148 
+size=32768 rep=10416 Mflops=20348.453 MByte/s=24418.144 
+size=65536 rep=5208 Mflops=20221.211 MByte/s=24265.453 
+size=131072 rep=2604 Mflops=20477.469 MByte/s=24572.963 
+size=262144 rep=1302 Mflops=20496.991 MByte/s=24596.390 
+size=524288 rep=651 Mflops=20494.100 MByte/s=24592.920 
+size=1048576 rep=325 Mflops=19645.386 MByte/s=23574.463 
+size=2097152 rep=162 Mflops=17855.205 MByte/s=21426.246 
+size=4194304 rep=81 Mflops=17471.323 MByte/s=20965.588 
+size=8388608 rep=40 Mflops=17266.479 MByte/s=20719.775 
+size=16777216 rep=20 Mflops=17276.110 MByte/s=20731.332 
+size=33554432 rep=10 Mflops=17265.703 MByte/s=20718.844 
+size=67108864 rep=5 Mflops=17404.475 MByte/s=20885.370 
+size=134217728 rep=2 Mflops=17449.003 MByte/s=20938.803 
+size=268435456 rep=1 Mflops=17283.910 MByte/s=20740.692 
+12flop 3xfloat
+size=4096 rep=83333 Mflops=21750.304 MByte/s=21750.304 
+size=8192 rep=41666 Mflops=21948.503 MByte/s=21948.503 
+size=16384 rep=20833 Mflops=22020.795 MByte/s=22020.795 
+size=32768 rep=10416 Mflops=22043.435 MByte/s=22043.435 
+size=65536 rep=5208 Mflops=21991.633 MByte/s=21991.633 
+size=131072 rep=2604 Mflops=21920.229 MByte/s=21920.229 
+size=262144 rep=1302 Mflops=21908.729 MByte/s=21908.729 
+size=524288 rep=651 Mflops=21909.847 MByte/s=21909.847 
+size=1048576 rep=325 Mflops=21092.943 MByte/s=21092.943 
+size=2097152 rep=162 Mflops=20040.778 MByte/s=20040.778 
+size=4194304 rep=81 Mflops=19976.365 MByte/s=19976.365 
+size=8388608 rep=40 Mflops=20052.336 MByte/s=20052.336 
+size=16777216 rep=20 Mflops=20038.267 MByte/s=20038.267 
+size=33554432 rep=10 Mflops=20058.577 MByte/s=20058.577 
+size=67108864 rep=5 Mflops=20027.804 MByte/s=20027.804 
+size=134217728 rep=2 Mflops=20063.209 MByte/s=20063.209 
+size=268435456 rep=1 Mflops=20063.779 MByte/s=20063.779 
