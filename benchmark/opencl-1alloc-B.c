@@ -18,7 +18,7 @@ int main(void)
 {
         float *x; 
         cl_mem x_cl;
-	unsigned long i, j, k, ilim;
+	unsigned long i, j, k;
         unsigned long loopmin = 1UL << LOOPMIN; 
         unsigned long loopmax = 1UL << LOOPMAX;
         unsigned long loopsize;
@@ -120,9 +120,7 @@ int main(void)
         size_t local_item_size; // Divide work items into groups of 64
         
         // Benchmark starts here
-        ptrtimer_reset(t0);
         printf("a[] *= m\n");
-        ilim = loopmin;
         kernel = clCreateKernel(program, "vector_1mul1float", &ret);
         if( ret != CL_SUCCESS) {
                 printf("clCreateKernel %d\n", ret);
@@ -175,9 +173,7 @@ int main(void)
         }        
         
         // Benchmark starts here
-        ptrtimer_reset(t0);
         printf("a[] += b\n");
-        ilim = loopmin;
         kernel = clCreateKernel(program, "vector_1add1float", &ret);
         if( ret != CL_SUCCESS) {
                 printf("clCreateKernel %d\n", ret);
@@ -189,6 +185,7 @@ int main(void)
                 exit(1);
         }
         for (i = loopmin; i<loopsize; i=i << 1) {
+                ptrtimer_reset(t0);
                 for (j = 0;j < loopsize / i;j++) {
                         ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&x_cl);
                         if( ret != CL_SUCCESS) {
@@ -219,7 +216,6 @@ int main(void)
                 printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n", i, loopsize / i,
 			(double)i / ptrtimer_getavg(t0) * 1.0 / 1000000.0,
 			(double)i / ptrtimer_getavg(t0) * 2.0 * sizeof(float) / 1000000.0);
-                ptrtimer_reset(t0);
         }
 	ret = clReleaseMemObject(x_cl);
         if (ret != CL_SUCCESS) {
@@ -234,7 +230,6 @@ int main(void)
         // Benchmark starts here
         ptrtimer_reset(t0);
         printf("a[] = a[]*m+b\n");
-        ilim = loopmin; 
         kernel = clCreateKernel(program, "vector_1mul1add1float", &ret);
         if( ret != CL_SUCCESS) {
                 printf("clCreateKernel %d\n", ret);
@@ -246,6 +241,7 @@ int main(void)
                 exit(1);
         }
         for (i = loopmin; i<loopsize; i=i << 1) {
+                ptrtimer_reset(t0);
                 for (j = 0;j < loopsize / i;j++) {
                         ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&x_cl);
                         if( ret != CL_SUCCESS) {
@@ -274,7 +270,6 @@ int main(void)
                 printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n", i, loopsize / i,
 			(double)i / ptrtimer_getavg(t0) * 2.0 / 1000000.0,
 			(double)i / ptrtimer_getavg(t0) * 2.0 * sizeof(float) / 1000000.0);
-                ptrtimer_reset(t0);
         }
 	ret = clReleaseMemObject(x_cl);
        	if (ret != CL_SUCCESS) {
