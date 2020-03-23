@@ -78,7 +78,7 @@ int main(void)
                         ptrtimer_stop(t0);
                 }
                 printf("size=%ld rep=%ld Mflops=%4.3f MByte/s=%4.3f \n", i, loopsize / i,
-                        (double)i / ptrtimer_getavg(t0) * 1.0/1000000.0,
+                        (double)i / ptrtimer_getavg(t0) * 1.0 / 1000000.0,
                         (double)i / ptrtimer_getavg(t0) * 2 * sizeof(float) / 1000000.0);
         }
 

@@ -12,89 +12,81 @@
 #define LOOPMAX 1 << 30
 #define THREADMIN 1
 #define THREADMAX 8
-int main()
+int main(void)
 {
-// Generic variables
-long i,j,k;
-long loopmin = LOOPMIN, loopmax = LOOPMAX , loopsize;
-fftw_complex *a, *b;
-fftw_plan p;
+	// Generic variables
+	long i,j,k;
+	long loopmin = LOOPMIN, loopmax = LOOPMAX , loopsize;
+	fftw_complex *a, *b;
+	fftw_plan p;
+
+	printf("Compiler " ptrbench_C_COMPILER_ID "\n Version " ptrbench_C_COMPILER_VERSION "\n CFLAGS " ptrbench_CFLAGS "\n");
+
+	srand(time(NULL)); /* Call me only once  */
 
 
-printf("Compiler " ptrbench_C_COMPILER_ID "\n Version " ptrbench_C_COMPILER_VERSION "\n CFLAGS " ptrbench_CFLAGS "\n");
+	printf("Timer allocation\n");
+	ptrtimer *t0;
+	t0 = ptrtimer_init(10);
+	if(t0 == NULL) {
+   		printf("Cannot allocate timer\n");
+   		return -1;
+	}
 
-srand(time(NULL)); /* Call me only once  */
+	// Adjust the loop parameters
+	loopsize = (TOTALSIZE/sizeof(fftw_complex))/2;
+	printf("Total memory allocated %ld Mbytes\n",loopsize*3*sizeof(float)/(1024*1024));
+	printf("Loop size              %ld Mfloats\n",loopsize/(1024*1024));
 
+	if (loopmin > loopsize)
+   		loopmin = loopsize;
+	if (loopmax > loopsize)
+   		loopmax = loopsize;
 
-printf("Timer allocation\n");
-ptrtimer *t0;
-t0 = ptrtimer_init(10);
-if(t0 == NULL)
-{
-   printf("Cannot allocate timer\n");
-   return -1;
-}
+	printf("Loop min size          %ld floats\n",loopmin);
+	printf("Loop max size          %ld floats\n",loopmax);
 
-// Adjust the loop parameters
-loopsize = (TOTALSIZE/sizeof(fftw_complex))/2;
-printf("Total memory allocated %ld Mbytes\n",loopsize*3*sizeof(float)/(1024*1024));
-printf("Loop size              %ld Mfloats\n",loopsize/(1024*1024));
+	/* Array setup */
+	printf("Allocate a\n");
+	ptrtimer_start(t0);
+	a = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * loopsize);
+	if (a == NULL) {
+  	 	printf("Cannot allocate a\n");
+   		return -1;
+	}
+	printf("Allocate b\n");
+	b = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * loopsize);
+	if (b == NULL) {
+   		printf("Cannot allocate b\n");
+   		return -1;
+	}
+	ptrtimer_stop(t0);
+	ptrtimer_report(t0);
 
-if (loopmin > loopsize)
-   loopmin = loopsize;
-if (loopmax > loopsize)
-   loopmax = loopsize;
+	printf("1d dft comple float 64 out of place\n");
+	ptrtimer_reset(t0);
+	for (i = loopmin; i<loopsize; i=i << 1) {
+	   	p = fftw_plan_dft_1d(i, a, b, FFTW_FORWARD, FFTW_EXHAUSTIVE);
+   		for (j=0;j<loopsize/i;j++) {
+      			for  (k=0 ; k<i; k++) {
+         			a[k][0] = (float)k/loopsize;
+         			a[k][1] = (float)k/loopsize;
+      			}
+      			ptrtimer_start(t0);
+      			fftw_execute(p); /* repeat as needed */
+      			ptrtimer_stop(t0);
+   		}
+   		fftw_destroy_plan(p);
+   		printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n",i,loopsize/i,
+			(5*(double)i*log2((double)i))/ptrtimer_getavg(t0)/1000000.0,
+			(double)i/ptrtimer_getavg(t0)*2*sizeof(fftw_complex)/1000000.0);
+   		ptrtimer_reset(t0);
+	}
 
-printf("Loop min size          %ld floats\n",loopmin);
-printf("Loop max size          %ld floats\n",loopmax);
-
-// Allocate arrays
-
-/* Array setup */
-printf("Allocate a\n");
-ptrtimer_start(t0);
-a = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * loopsize);
-if (a == NULL)
-{
-   printf("Cannot allocate a\n");
-   return -1;
-}
-printf("Allocate b\n");
-b = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * loopsize);
-if (b == NULL)
-{
-   printf("Cannot allocate b\n");
-   return -1;
-}
-ptrtimer_stop(t0);
-ptrtimer_report(t0);
-
-printf("1d dft comple float 64 out of place\n");
-ptrtimer_reset(t0);
-for (i = loopmin; i<loopsize; i=i << 1)
-{
-   p = fftw_plan_dft_1d(i, a, b, FFTW_FORWARD, FFTW_EXHAUSTIVE);
-   for (j=0;j<loopsize/i;j++)
-   {
-      for  (k=0 ; k<i; k++)
-      {
-         a[k][0] = (float)k/loopsize;
-         a[k][1] = (float)k/loopsize;
-      }
-      ptrtimer_start(t0);
-      fftw_execute(p); /* repeat as needed */
-      ptrtimer_stop(t0);
-   }
-   fftw_destroy_plan(p);
-   printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n",i,loopsize/i,(5*(double)i*log2((double)i))/ptrtimer_getavg(t0)/1000000.0,(double)i/ptrtimer_getavg(t0)*2*sizeof(fftw_complex)/1000000.0);
-   ptrtimer_reset(t0);
-}
-
-ptrtimer_close(t0);
-
-printf("Free b\n");
-fftw_free(b);
-printf("Free a\n");
-fftw_free(a);
-return 0;
+	ptrtimer_close(t0);
+	printf("Free b\n");
+	fftw_free(b);
+	printf("Free a\n");
+	fftw_free(a);
+	return 0;
 }
