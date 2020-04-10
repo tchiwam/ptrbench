@@ -5,10 +5,10 @@
 #include<CL/cl.h>
 #include<config.h>
 
-#define TOTALSIZE 7096000000
+#define TOTALSIZE 8192000000
 // 1k=10 2k=11 4k=12 8k=13 16k=14 32k=15 64k=16 128k=17 256k=18 512k=19 
 // 1M=20 2M=21 4M=22 8M=23 16M=24 32M=25 64M=26 128M=27 256M=28 512M=29 
-// 1G=30 ...
+// 1G=30
 #define LOOPMIN  10
 #define LOOPMAX  31
 #define THREADMIN 1
@@ -16,22 +16,20 @@
 
 int main(void)
 {
-        float *x; 
-        cl_mem x_cl;
-	unsigned long i, j, k;
+        float *x, *a, *b; 
+        unsigned long i, j, k;
         unsigned long loopmin = 1UL << LOOPMIN; 
         unsigned long loopmax = 1UL << LOOPMAX;
         unsigned long loopsize;
-
         ptrtimer *t0;
         t0 = ptrtimer_init(10);
 
         printf("Compiler " ptrbench_C_COMPILER_ID "\n Version " ptrbench_C_COMPILER_VERSION "\n CFLAGS " ptrbench_CFLAGS "\n");
    
         // Adjust the loop parameters
-        loopsize = (TOTALSIZE/sizeof(float)) / 1;
-        printf("Total memory allocated %ld Mbytes \n", loopsize * 1 * sizeof(float) / (1024 * 1024));
-        printf("Loop size              %ld Mfloats\n", loopsize / (1024 * 1024));
+        loopsize = (TOTALSIZE/sizeof(float))/3;
+        printf("Total memory allocated %ld Mbytes \n", loopsize*3*sizeof(float)/(1024*1024));
+        printf("Loop size              %ld Mfloats\n", loopsize/(1024*1024));
 
         if (loopmin > loopsize) {
                 printf("Adjusting loopsize to loopmin\n");
@@ -47,6 +45,8 @@ int main(void)
 
         // Allocate arrays
         x = malloc(loopsize*sizeof(float));
+        a = malloc(loopsize*sizeof(float));
+        b = malloc(loopsize*sizeof(float));
 
         FILE *file;
         char *source_cl;
@@ -95,12 +95,35 @@ int main(void)
         cl_context context = clCreateContext( NULL, 1, &device_id, NULL, NULL, &ret);
         cl_command_queue command_queue = clCreateCommandQueueWithProperties(context, device_id, 0, &ret);
         printf("clCreateCommandQueueWithProperties %d\n", ret);
-	
+
+        cl_mem a_cl = clCreateBuffer(context, CL_MEM_READ_ONLY, loopsize * sizeof(float), NULL, &ret);
+        if (ret != CL_SUCCESS) {
+                printf("lCreateBuffer a %d\n", ret);
+                exit(1);
+        }
+   
+        cl_mem b_cl = clCreateBuffer(context, CL_MEM_READ_ONLY, loopsize * sizeof(float), NULL, &ret);
+        if (ret != CL_SUCCESS) {
+                printf("lCreateBuffer b %d\n", ret);
+                exit(1);
+        }
+   
+        cl_mem x_cl = clCreateBuffer(context, CL_MEM_READ_WRITE, loopsize * sizeof(float), NULL, &ret);
+        if (ret != CL_SUCCESS) {
+                printf("lCreateBuffer c %d\n", ret);
+                exit(1);
+        }
         // Make up some values
         for (i = 0;i < loopsize;i++) {
+                a[i] = (float)i;
+                b[i] = (float)loopsize - i;
                 x[i] = (float)i / loopsize;
         }
         
+        // Copy the lists A and B to their respective memory buffers
+        ret = clEnqueueWriteBuffer(command_queue, a_cl, CL_TRUE, 0, loopsize * sizeof(float), a, 0, NULL, NULL);
+        ret = clEnqueueWriteBuffer(command_queue, b_cl, CL_TRUE, 0, loopsize * sizeof(float), b, 0, NULL, NULL);
+
         // Create a program from the kernel source
         printf("Create program with source\n");
         cl_program program = clCreateProgramWithSource(context, 1, (const char **)&source_cl, (const size_t *)&source_cl_size, &ret);
@@ -120,30 +143,27 @@ int main(void)
         size_t local_item_size; // Divide work items into groups of 64
         
         // Benchmark starts here
+        ptrtimer_reset(t0);
         printf("a[] *= m\n");
         kernel = clCreateKernel(program, "vector_1mul1float", &ret);
         if( ret != CL_SUCCESS) {
                 printf("clCreateKernel %d\n", ret);
                 exit(1);
         }
-        x_cl = clCreateBuffer(context, CL_MEM_READ_WRITE, loopsize * sizeof(float), NULL, &ret);
-        if (ret != CL_SUCCESS) {
-                printf("lCreateBuffer c %d\n", ret);
+        ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&x_cl);
+        if( ret != CL_SUCCESS) {
+                printf("clSetKernelArg %d\n", ret);
                 exit(1);
         }
+        ret = clGetKernelWorkGroupInfo(kernel, device_id, CL_KERNEL_WORK_GROUP_SIZE, sizeof(local_item_size), &local_item_size, NULL);
+        if( ret != CL_SUCCESS) {
+                printf("clGetKernelWorkGroupInfo %d\n", ret);
+                exit(1);
+        }
+        printf("Local Size item %ld \n", local_item_size);
         for (i = loopmin; i<loopsize; i=i << 1) {
                 ptrtimer_reset(t0);
                 for (j = 0;j < loopsize / i;j++) {
-        		ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&x_cl);
-        		if( ret != CL_SUCCESS) {
-                		printf("clSetKernelArg %d\n", ret);
-                		exit(1);
-        		}
-        		ret = clGetKernelWorkGroupInfo(kernel, device_id, CL_KERNEL_WORK_GROUP_SIZE, sizeof(local_item_size), &local_item_size, NULL);
-        		if( ret != CL_SUCCESS) {
-        		        printf("clGetKernelWorkGroupInfo %d\n", ret);
-        		        exit(1);
-        		}
                         ptrtimer_start(t0);
                         global_item_size = i;
                         ret = clEnqueueNDRangeKernel(command_queue, kernel, 1, NULL, &global_item_size, &local_item_size, 0, NULL, NULL);
@@ -158,13 +178,15 @@ int main(void)
                                 exit(1);
                         }
                 }
-                printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n", i, loopsize / i,
-			(double)i / ptrtimer_getavg(t0) * 1.0 / 1000000.0, 
-			(double)i / ptrtimer_getavg(t0) * 2.0 * sizeof(float) / 1000000.0);
+                printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n", i, loopsize / i, (double)i / ptrtimer_getavg(t0) * 1.0 / 1000000.0, (double)i / ptrtimer_getavg(t0) * 2.0 * sizeof(float) / 1000000.0);
         }
-	ret = clReleaseMemObject(x_cl);
         if (ret != CL_SUCCESS) {
-                printf("clReleaseMemObject x_cl %d\n", ret);
+                printf("clFlush %d\n", ret);
+                exit(1);
+        }
+        ret = clFinish(command_queue);
+        if (ret != CL_SUCCESS) {
+                printf("clFinish %d\n", ret);
                 exit(1);
         }
         if (ret != CL_SUCCESS) {
@@ -173,31 +195,27 @@ int main(void)
         }        
         
         // Benchmark starts here
+        ptrtimer_reset(t0);
         printf("a[] += b\n");
         kernel = clCreateKernel(program, "vector_1add1float", &ret);
         if( ret != CL_SUCCESS) {
                 printf("clCreateKernel %d\n", ret);
                 exit(1);
         }
-        x_cl = clCreateBuffer(context, CL_MEM_READ_WRITE, loopsize * sizeof(float), NULL, &ret);
-        if (ret != CL_SUCCESS) {
-                printf("lCreateBuffer c %d\n", ret);
+        ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&x_cl);
+        if( ret != CL_SUCCESS) {
+                printf("clSetKernelArg %d\n", ret);
                 exit(1);
         }
+        ret = clGetKernelWorkGroupInfo(kernel, device_id, CL_KERNEL_WORK_GROUP_SIZE, sizeof(local_item_size), &local_item_size, NULL);
+        if( ret != CL_SUCCESS) {
+                printf("clGetKernelWorkGroupInfo %d\n", ret);
+                exit(1);
+        }
+        printf("Local Size item %ld \n", local_item_size);
         for (i = loopmin; i<loopsize; i=i << 1) {
                 ptrtimer_reset(t0);
                 for (j = 0;j < loopsize / i;j++) {
-                        ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&x_cl);
-                        if( ret != CL_SUCCESS) {
-                                printf("clSetKernelArg %d\n", ret);
-                                exit(1);
-                        }
-                        ret = clGetKernelWorkGroupInfo(kernel, device_id, CL_KERNEL_WORK_GROUP_SIZE, sizeof(local_item_size), &local_item_size, NULL);
-                        if( ret != CL_SUCCESS) {
-                                printf("clGetKernelWorkGroupInfo %d\n", ret);
-                                exit(1);
-                        }
-
                         ptrtimer_start(t0);
                         global_item_size = i;
                         ret = clEnqueueNDRangeKernel(command_queue, kernel, 1, NULL, &global_item_size, &local_item_size, 0, NULL, NULL);
@@ -211,15 +229,16 @@ int main(void)
                                 printf("clFinish %d\n", ret);
                                 exit(1);
                         }
-
                 }
-                printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n", i, loopsize / i,
-			(double)i / ptrtimer_getavg(t0) * 1.0 / 1000000.0,
-			(double)i / ptrtimer_getavg(t0) * 2.0 * sizeof(float) / 1000000.0);
+                printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n", i, loopsize / i, (double)i / ptrtimer_getavg(t0) * 1.0 / 1000000.0, (double)i / ptrtimer_getavg(t0) * 2.0 * sizeof(float) / 1000000.0);
         }
-	ret = clReleaseMemObject(x_cl);
         if (ret != CL_SUCCESS) {
-                printf("clReleaseMemObject x_cl %d\n", ret);
+                printf("clFlush %d\n", ret);
+                exit(1);
+        }
+        ret = clFinish(command_queue);
+        if (ret != CL_SUCCESS) {
+                printf("clFinish %d\n", ret);
                 exit(1);
         }
         if (ret != CL_SUCCESS) {
@@ -235,24 +254,20 @@ int main(void)
                 printf("clCreateKernel %d\n", ret);
                 exit(1);
         }
-        x_cl = clCreateBuffer(context, CL_MEM_READ_WRITE, loopsize * sizeof(float), NULL, &ret);
-        if (ret != CL_SUCCESS) {
-                printf("lCreateBuffer c %d\n", ret);
+        ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&x_cl);
+        if( ret != CL_SUCCESS) {
+                printf("clSetKernelArg %d\n", ret);
                 exit(1);
         }
+        ret = clGetKernelWorkGroupInfo(kernel, device_id, CL_KERNEL_WORK_GROUP_SIZE, sizeof(local_item_size), &local_item_size, NULL);
+        if( ret != CL_SUCCESS) {
+                printf("clGetKernelWorkGroupInfo %d\n", ret);
+                exit(1);
+        }
+        printf("Local Size item %ld \n", local_item_size);
         for (i = loopmin; i<loopsize; i=i << 1) {
                 ptrtimer_reset(t0);
                 for (j = 0;j < loopsize / i;j++) {
-                        ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&x_cl);
-                        if( ret != CL_SUCCESS) {
-                                printf("clSetKernelArg %d\n", ret);
-                                exit(1);
-                        }
-                        ret = clGetKernelWorkGroupInfo(kernel, device_id, CL_KERNEL_WORK_GROUP_SIZE, sizeof(local_item_size), &local_item_size, NULL);
-                        if( ret != CL_SUCCESS) {
-                                printf("clGetKernelWorkGroupInfo %d\n", ret);
-                                exit(1);
-                        }
                         ptrtimer_start(t0);
                         global_item_size = i;
                         ret = clEnqueueNDRangeKernel(command_queue, kernel, 1, NULL, &global_item_size, &local_item_size, 0, NULL, NULL);
@@ -267,15 +282,17 @@ int main(void)
                                 exit(1);
                         }
                 }
-                printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n", i, loopsize / i,
-			(double)i / ptrtimer_getavg(t0) * 2.0 / 1000000.0,
-			(double)i / ptrtimer_getavg(t0) * 2.0 * sizeof(float) / 1000000.0);
+                printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n", i, loopsize / i, (double)i / ptrtimer_getavg(t0) * 2.0 / 1000000.0, (double)i / ptrtimer_getavg(t0) * 2.0 * sizeof(float) / 1000000.0);
         }
-	ret = clReleaseMemObject(x_cl);
-       	if (ret != CL_SUCCESS) {
-       		printf("clReleaseMemObject x_cl %d\n", ret);
-       		exit(1);
-       	}
+        if (ret != CL_SUCCESS) {
+                printf("clFlush %d\n", ret);
+                exit(1);
+        }
+        ret = clFinish(command_queue);
+        if (ret != CL_SUCCESS) {
+                printf("clFinish %d\n", ret);
+                exit(1);
+        }
         if (ret != CL_SUCCESS) {
                 printf("clReleaseKernel %d\n", ret);
                 exit(1);
@@ -288,6 +305,21 @@ int main(void)
                 printf("clReleaseProgram %d\n", ret);
                 exit(1);
         }
+        ret = clReleaseMemObject(a_cl);
+        if (ret != CL_SUCCESS) {
+                printf("clReleaseMemObject a_cl %d\n", ret);
+                exit(1);
+        }
+        ret = clReleaseMemObject(b_cl);
+        if (ret != CL_SUCCESS) {
+                printf("clReleaseMemObject b_cl %d\n", ret);
+                exit(1);
+        }
+        ret = clReleaseMemObject(x_cl);
+        if (ret != CL_SUCCESS) {
+                printf("clReleaseMemObject x_cl %d\n", ret);
+                exit(1);
+        }
         ret = clReleaseCommandQueue(command_queue); 
         if (ret != CL_SUCCESS) {
                 printf("clReleaseCommandQueue %d\n", ret);
@@ -295,12 +327,14 @@ int main(void)
         }
         ret = clReleaseContext(context);
         if (ret != CL_SUCCESS) {
-                printf("clReleaseContext %d\n", ret);
+                printf("clReleaseContent %d\n", ret);
                 exit(1);
         }
         free(source_cl);
         free(filename);
         ptrtimer_close(t0);
+        free(a);
+        free(b);
         free(x);
 }
 
