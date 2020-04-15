@@ -5,7 +5,7 @@
 #include<CL/cl.h>
 #include<config.h>
 
-#define TOTALSIZE 7096000000
+#define TOTALSIZE 128000000
 // 1k=10 2k=11 4k=12 8k=13 16k=14 32k=15 64k=16 128k=17 256k=18 512k=19 
 // 1M=20 2M=21 4M=22 8M=23 16M=24 32M=25 64M=26 128M=27 256M=28 512M=29 
 // 1G=30 ...
