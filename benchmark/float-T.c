@@ -3,7 +3,7 @@
 #include<stdio.h>
 #include<config.h>
 #include<pthread.h>
-
+#include <sys/sysinfo.h>
 
 #define TOTALSIZE 65536000000
 // 1k=10 2k=11 4k=12 8k=13 16k=14 32k=15 64k=16 128k=17 256k=18 512k=19 
@@ -13,6 +13,10 @@
 #define LOOPMAX 35
 #define THREADMIN 1
 #define THREADMAX 8
+
+
+pthread_barrier_t   barrier1;
+pthread_barrier_t   barrier2;
 
 
 struct thread_args {
@@ -27,11 +31,38 @@ void *out1in1flop1mul(void *function_args)
     float            *x = ((struct thread_args*)function_args)->x;
     unsigned long start = ((struct thread_args*)function_args)->start;
     unsigned long stop  = ((struct thread_args*)function_args)->stop;
-    //printf("Thread %ld %ld\n", start, stop);
-    
+    pthread_barrier_wait (&barrier1);  
     for(; start < stop; start++) {
                 x[start] *= 1.07;          
         }
+    pthread_barrier_wait (&barrier2);
+}
+
+
+/*  x[k] += n  */
+void *out1in1flop1add(void *function_args)
+{
+    float            *x = ((struct thread_args*)function_args)->x;
+    unsigned long start = ((struct thread_args*)function_args)->start;
+    unsigned long stop  = ((struct thread_args*)function_args)->stop;
+    pthread_barrier_wait (&barrier1);
+    for(; start < stop; start++) {
+                x[start] += 1.07;          
+        }
+    pthread_barrier_wait (&barrier2);
+}
+
+/*  x[k] = x[k]*n*b  */
+void *out1in1flop1mul1add(void *function_args)
+{
+    float            *x = ((struct thread_args*)function_args)->x;
+    unsigned long start = ((struct thread_args*)function_args)->start;
+    unsigned long stop  = ((struct thread_args*)function_args)->stop;
+    pthread_barrier_wait (&barrier1);
+    for(; start < stop; start++) {
+                x[start] = x[start]*1.07+1.2;          
+        }
+    pthread_barrier_wait (&barrier2);
 }
 
 int main(void)
@@ -44,7 +75,7 @@ int main(void)
         unsigned long loopsize;
         
         /*Multi threading stuff here*/
-        unsigned long Nthreads = 8;
+        unsigned long Nthreads = 16;
         struct thread_args **function_args = (struct thread_args **)malloc(sizeof(struct thread_args*)*Nthreads);
         for(k = 0; k < Nthreads; k++)
             function_args[k] = (struct thread_args *)malloc(sizeof(struct thread_args));
@@ -86,23 +117,95 @@ int main(void)
         for (i = loopmin; i<loopsize; i = i<<1) {
                 ptrtimer_reset(t0);
                 for (j = 0; j < loopsize / i; j++) {
+                        pthread_barrier_init (&barrier1, NULL, Nthreads+1);
+                        pthread_barrier_init (&barrier2, NULL, Nthreads+1);
                         for(k = 0; k < Nthreads; k++) {
                                 (function_args[k])->x = x;
                                 (function_args[k])->start = (i/Nthreads)*k;
                                 (function_args[k])->stop  = (i/Nthreads)*(k+1);
                         }
-                        ptrtimer_start(t0);
                         for(k = 0; k < Nthreads; k++)
                                 pthread_create(&(tid[k]),NULL,out1in1flop1mul,(void *)(function_args[k]));
+                        ptrtimer_start(t0);
+                        pthread_barrier_wait (&barrier1);
+                        pthread_barrier_wait (&barrier2);
+                        ptrtimer_stop(t0);                        
                         for(k = 0; k < Nthreads; k++)
                                 pthread_join(tid[k],NULL);
-                        ptrtimer_stop(t0);
+                        pthread_barrier_destroy(&barrier1);
+                        pthread_barrier_destroy(&barrier2);                    
                 }
                 printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n",i, loopsize/i,
                         (double)i / ptrtimer_getavg(t0) * 1.0 / 1000000.0,
                         (double)i / ptrtimer_getavg(t0) * 2 * sizeof(float) / 1000000.0);
         }
+
+
+        printf("a[] += m\n");
+        for (i = loopmin; i<loopsize; i = i<<1) {
+                ptrtimer_reset(t0);
+                for (j = 0; j < loopsize / i; j++) {
+                        pthread_barrier_init (&barrier1, NULL, Nthreads+1);
+                        pthread_barrier_init (&barrier2, NULL, Nthreads+1);
+                        for(k = 0; k < Nthreads; k++) {
+                                (function_args[k])->x = x;
+                                (function_args[k])->start = (i/Nthreads)*k;
+                                (function_args[k])->stop  = (i/Nthreads)*(k+1);
+                        }
+                        for(k = 0; k < Nthreads; k++)
+                                pthread_create(&(tid[k]),NULL,out1in1flop1add,(void *)(function_args[k]));
+                        ptrtimer_start(t0);
+                        pthread_barrier_wait (&barrier1);
+                        pthread_barrier_wait (&barrier2);
+                        ptrtimer_stop(t0);
+                        for(k = 0; k < Nthreads; k++)
+                                pthread_join(tid[k],NULL);
+                        pthread_barrier_destroy(&barrier1);
+                        pthread_barrier_destroy(&barrier2);                    
+                }
+                printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n",i, loopsize/i,
+                        (double)i / ptrtimer_getavg(t0) * 1.0 / 1000000.0,
+                        (double)i / ptrtimer_getavg(t0) * 2 * sizeof(float) / 1000000.0);
+        }
+
+        printf("a[] = a[]*m+b\n");
+        for (i = loopmin; i<loopsize; i = i<<1) {
+                ptrtimer_reset(t0);
+                for (j = 0; j < loopsize / i; j++) {
+                        pthread_barrier_init (&barrier1, NULL, Nthreads+1);
+                        pthread_barrier_init (&barrier2, NULL, Nthreads+1);
+                        for(k = 0; k < Nthreads; k++) {
+                                (function_args[k])->x = x;
+                                (function_args[k])->start = (i/Nthreads)*k;
+                                (function_args[k])->stop  = (i/Nthreads)*(k+1);
+                        }
+                        for(k = 0; k < Nthreads; k++)
+                                pthread_create(&(tid[k]),NULL,out1in1flop1mul1add,(void *)(function_args[k]));
+                        ptrtimer_start(t0);
+                        pthread_barrier_wait (&barrier1);
+                        pthread_barrier_wait (&barrier2);
+                        ptrtimer_stop(t0);
+                        for(k = 0; k < Nthreads; k++)
+                                pthread_join(tid[k],NULL);
+                        pthread_barrier_destroy(&barrier1);
+                        pthread_barrier_destroy(&barrier2);                    
+                
+                }
+                printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n",i, loopsize/i,
+                        (double)i / ptrtimer_getavg(t0) * 2.0 / 1000000.0,
+                        (double)i / ptrtimer_getavg(t0) * 2 * sizeof(float) / 1000000.0);
+        }
+        
+        
+        // Clean up
         ptrtimer_close(t0);
+        // Thread clean up
+        for(k = 0; k < Nthreads; k++)
+            free(function_args[k]);
+        free(function_args);
+        //pthread_mutex_destroy();
+        
+        // Testing variables clean up
         free(b);
         free(a);
         free(x);
