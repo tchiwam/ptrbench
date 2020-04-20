@@ -36,8 +36,67 @@ struct thread_args {
 
 /* Math kernels*/
 
+
 /*  x[k] *= n  */
-void *out1in1flop1mul_simple(void *function_args)
+void *out1in0constant_simple(void *function_args)
+{
+    float            *x = ((struct thread_args*)function_args)->x;
+    unsigned long start = ((struct thread_args*)function_args)->start;
+    unsigned long stop  = ((struct thread_args*)function_args)->stop;
+    for(; start < stop; start++) {
+                x[start] = 1.0;          
+        
+    }
+}
+
+void *out1in0cast1_simple(void *function_args)
+{
+    float            *x = ((struct thread_args*)function_args)->x;
+    unsigned long start = ((struct thread_args*)function_args)->start;
+    unsigned long stop  = ((struct thread_args*)function_args)->stop;
+    for(; start < stop; start++) {
+                x[start] = (float)start;          
+        
+    }
+}
+
+void *out1in0cast1mul1_simple(void *function_args)
+{
+    float            *x = ((struct thread_args*)function_args)->x;
+    unsigned long start = ((struct thread_args*)function_args)->start;
+    unsigned long stop  = ((struct thread_args*)function_args)->stop;
+    for(; start < stop; start++) {
+                x[start] = (float)start*1.5;          
+        
+    }
+}
+
+void *out1in0cast1mul1add1_simple(void *function_args)
+{
+    float            *x = ((struct thread_args*)function_args)->x;
+    unsigned long start = ((struct thread_args*)function_args)->start;
+    unsigned long stop  = ((struct thread_args*)function_args)->stop;
+    for(; start < stop; start++) {
+                x[start] = (float)start*1.5+0.3;          
+        
+    }
+}
+
+void *out1in0mul1add1_simple(void *function_args)
+{
+    float            *x = ((struct thread_args*)function_args)->x;
+    unsigned long start = ((struct thread_args*)function_args)->start;
+    unsigned long stop  = ((struct thread_args*)function_args)->stop;
+    float  i = -0.0002;
+    for(; start < stop; start++) {
+                x[start] = i*1.5+0.3;
+                i = i + 0.0001;
+        
+    }
+}
+
+/*  x[k] *= n  */
+void *out1in1mul1_simple(void *function_args)
 {
     float            *x = ((struct thread_args*)function_args)->x;
     unsigned long start = ((struct thread_args*)function_args)->start;
@@ -49,7 +108,7 @@ void *out1in1flop1mul_simple(void *function_args)
 }
 
 /*  x[k] *= n  */
-void *out1in1flop1mul_cond(void *function_args)
+void *out1in1mul1_cond(void *function_args)
 {
     float            *x = ((struct thread_args*)function_args)->x;
     unsigned long start = ((struct thread_args*)function_args)->start;
@@ -68,7 +127,7 @@ void *out1in1flop1mul_cond(void *function_args)
 }
 
 /*  x[k] *= n  */
-void *out1in1flop1mul(void *function_args)
+void *out1in1mul1(void *function_args)
 {
     float            *x = ((struct thread_args*)function_args)->x;
     unsigned long start = ((struct thread_args*)function_args)->start;
@@ -82,7 +141,7 @@ void *out1in1flop1mul(void *function_args)
 
 
 /*  x[k] += n  */
-void *out1in1flop1add(void *function_args)
+void *out1in1add1(void *function_args)
 {
     float            *x = ((struct thread_args*)function_args)->x;
     unsigned long start = ((struct thread_args*)function_args)->start;
@@ -95,7 +154,7 @@ void *out1in1flop1add(void *function_args)
 }
 
 /*  x[k] = x[k]*n*b  */
-void *out1in1flop1mul1add(void *function_args)
+void *out1in1mul1add1(void *function_args)
 {
     float            *x = ((struct thread_args*)function_args)->x;
     unsigned long start = ((struct thread_args*)function_args)->start;
@@ -150,15 +209,80 @@ int main(void)
         a = malloc(loopsize * sizeof(float));
         b = malloc(loopsize * sizeof(float));
 
-        ptrtimer_start(t0);
-        for(k = 0; k < loopsize; k++) {
-                a[k] = (float)k / 0.5;
-                b[k] = (float)k * 1.7;
-                x[k] = (float)k * -0.6;
+        printf("a[] = (float)k single thread\n");
+        for (i = loopmin; i<loopsize; i = i<<1) {
+                ptrtimer_reset(t0);
+                for (j = 0; j < loopsize / i; j++) {
+                        (function_args[0])->x = x;
+                        (function_args[0])->start = 0;
+                        (function_args[0])->stop  = i;
+                        ptrtimer_start(t0);
+                        out1in0cast1_simple((void *)(function_args[0]));
+                        ptrtimer_stop(t0);                     
+                }
+                printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n",i, loopsize/i,
+                        (double)i / ptrtimer_getavg(t0) * 1.0 / 1000000.0,
+                        (double)i / ptrtimer_getavg(t0) * 2 * sizeof(float) / 1000000.0);
         }
-        ptrtimer_stop(t0);
-        ptrtimer_report(t0);
+        
+        printf("a[] = (float)k*m single thread\n");
+        for (i = loopmin; i<loopsize; i = i<<1) {
+                ptrtimer_reset(t0);
+                for (j = 0; j < loopsize / i; j++) {
+                        (function_args[0])->x = a;
+                        (function_args[0])->start = 0;
+                        (function_args[0])->stop  = i;
+                        ptrtimer_start(t0);
+                        out1in0cast1mul1_simple((void *)(function_args[0]));
+                        ptrtimer_stop(t0);                     
+                }
+                printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n",i, loopsize/i,
+                        (double)i / ptrtimer_getavg(t0) * 1.0 / 1000000.0,
+                        (double)i / ptrtimer_getavg(t0) * 2 * sizeof(float) / 1000000.0);
+        }        
 
+        printf("a[] =(float)k*m+b simple fork\n");
+        for (i = loopmin; i<loopsize; i = i<<1) {
+                ptrtimer_reset(t0);
+                for (j = 0; j < loopsize / i; j++) {
+                        for(k = 0; k < Nthreads; k++) {
+                                (function_args[k])->x = b;
+                                (function_args[k])->start = (i/Nthreads)*k;
+                                (function_args[k])->stop  = (i/Nthreads)*(k+1);
+                        }
+                        ptrtimer_start(t0);
+                        for(k = 0; k < Nthreads; k++)
+                                pthread_create(&(tid[k]),NULL,out1in0cast1mul1add1_simple,(void *)(function_args[k]));
+                        for(k = 0; k < Nthreads; k++)
+                                pthread_join(tid[k],NULL);
+                        ptrtimer_stop(t0);
+                }
+                printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n",i, loopsize/i,
+                        (double)i / ptrtimer_getavg(t0) * 1.0 / 1000000.0,
+                        (double)i / ptrtimer_getavg(t0) * 2 * sizeof(float) / 1000000.0);
+        }
+        
+        printf("a[] =k*m+b simple fork\n");
+        for (i = loopmin; i<loopsize; i = i<<1) {
+                ptrtimer_reset(t0);
+                for (j = 0; j < loopsize / i; j++) {
+                        for(k = 0; k < Nthreads; k++) {
+                                (function_args[k])->x = b;
+                                (function_args[k])->start = (i/Nthreads)*k;
+                                (function_args[k])->stop  = (i/Nthreads)*(k+1);
+                        }
+                        ptrtimer_start(t0);
+                        for(k = 0; k < Nthreads; k++)
+                                pthread_create(&(tid[k]),NULL,out1in0mul1add1_simple,(void *)(function_args[k]));
+                        for(k = 0; k < Nthreads; k++)
+                                pthread_join(tid[k],NULL);
+                        ptrtimer_stop(t0);
+                }
+                printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n",i, loopsize/i,
+                        (double)i / ptrtimer_getavg(t0) * 1.0 / 1000000.0,
+                        (double)i / ptrtimer_getavg(t0) * 2 * sizeof(float) / 1000000.0);
+        }
+        
         printf("a[] *= m single thread\n");
         for (i = loopmin; i<loopsize; i = i<<1) {
                 ptrtimer_reset(t0);
@@ -167,7 +291,7 @@ int main(void)
                         (function_args[0])->start = 0;
                         (function_args[0])->stop  = i;
                         ptrtimer_start(t0);
-                        out1in1flop1mul_simple((void *)(function_args[0]));
+                        out1in1mul1_simple((void *)(function_args[0]));
                         ptrtimer_stop(t0);                     
                 }
                 printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n",i, loopsize/i,
@@ -186,7 +310,7 @@ int main(void)
                         }
                         ptrtimer_start(t0);
                         for(k = 0; k < Nthreads; k++)
-                                pthread_create(&(tid[k]),NULL,out1in1flop1mul_simple,(void *)(function_args[k]));
+                                pthread_create(&(tid[k]),NULL,out1in1mul1_simple,(void *)(function_args[k]));
                         for(k = 0; k < Nthreads; k++)
                                 pthread_join(tid[k],NULL);
                         ptrtimer_stop(t0);
@@ -213,7 +337,7 @@ int main(void)
 //                         printf("Main lock\n");
                         pthread_mutex_lock(&mutex);
                         for(k = 0; k < Nthreads; k++)
-                                pthread_create(&(tid[k]),NULL,out1in1flop1mul_cond,(void *)(function_args[k]));
+                                pthread_create(&(tid[k]),NULL,out1in1mul1_cond,(void *)(function_args[k]));
                         
                         waitvar = 1;                        
                         //usleep(10000);
@@ -246,7 +370,7 @@ int main(void)
                                 (function_args[k])->stop  = (i/Nthreads)*(k+1);
                         }
                         for(k = 0; k < Nthreads; k++)
-                                pthread_create(&(tid[k]),NULL,out1in1flop1mul,(void *)(function_args[k]));
+                                pthread_create(&(tid[k]),NULL,out1in1mul1,(void *)(function_args[k]));
                         ptrtimer_start(t0);
                         pthread_barrier_wait (&barrier1);
                         pthread_barrier_wait (&barrier2);
@@ -274,7 +398,7 @@ int main(void)
                                 (function_args[k])->stop  = (i/Nthreads)*(k+1);
                         }
                         for(k = 0; k < Nthreads; k++)
-                                pthread_create(&(tid[k]),NULL,out1in1flop1add,(void *)(function_args[k]));
+                                pthread_create(&(tid[k]),NULL,out1in1add1,(void *)(function_args[k]));
                         ptrtimer_start(t0);
                         pthread_barrier_wait (&barrier1);
                         pthread_barrier_wait (&barrier2);
@@ -301,7 +425,7 @@ int main(void)
                                 (function_args[k])->stop  = (i/Nthreads)*(k+1);
                         }
                         for(k = 0; k < Nthreads; k++)
-                                pthread_create(&(tid[k]),NULL,out1in1flop1mul1add,(void *)(function_args[k]));
+                                pthread_create(&(tid[k]),NULL,out1in1mul1add1,(void *)(function_args[k]));
                         ptrtimer_start(t0);
                         pthread_barrier_wait (&barrier1);
                         pthread_barrier_wait (&barrier2);
