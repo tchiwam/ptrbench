@@ -253,9 +253,9 @@ int main(void)
                         out1in0cast1_simple((void *)(function_args[0]));
                         ptrtimer_stop(t0);                     
                 }
-                printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n",i, rep,
+                printf("size=%ld rep=%ld Mcast/s=%4.3f MByte/s=%4.3f \n",i, rep,
                         (double)i / ptrtimer_getavg(t0) * 1.0 / 1000000.0,
-                        (double)i / ptrtimer_getavg(t0) * 2 * sizeof(float) / 1000000.0);
+                        (double)i / ptrtimer_getavg(t0) * 1 * sizeof(float) / 1000000.0);
         }
         
         printf("a[] = (float)k*m single thread\n");
@@ -274,7 +274,7 @@ int main(void)
                 }
                 printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n",i, rep,
                         (double)i / ptrtimer_getavg(t0) * 1.0 / 1000000.0,
-                        (double)i / ptrtimer_getavg(t0) * 2 * sizeof(float) / 1000000.0);
+                        (double)i / ptrtimer_getavg(t0) * 1 * sizeof(float) / 1000000.0);
         }        
 
         printf("a[] = (float)k*m+b single thread\n");
@@ -292,8 +292,8 @@ int main(void)
                         ptrtimer_stop(t0);                     
                 }
                 printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n",i, rep,
-                        (double)i / ptrtimer_getavg(t0) * 1.0 / 1000000.0,
-                        (double)i / ptrtimer_getavg(t0) * 2 * sizeof(float) / 1000000.0);
+                        (double)i / ptrtimer_getavg(t0) * 2.0 / 1000000.0,
+                        (double)i / ptrtimer_getavg(t0) * 1 * sizeof(float) / 1000000.0);
         }   
         
         printf("a[] =(float)k*m+b simple fork\n");
@@ -316,8 +316,8 @@ int main(void)
                         ptrtimer_stop(t0);
                 }
                 printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n",i, rep,
-                        (double)i / ptrtimer_getavg(t0) * 1.0 / 1000000.0,
-                        (double)i / ptrtimer_getavg(t0) * 2 * sizeof(float) / 1000000.0);
+                        (double)i / ptrtimer_getavg(t0) * 2.0 / 1000000.0,
+                        (double)i / ptrtimer_getavg(t0) * 1 * sizeof(float) / 1000000.0);
         }
         
         printf("a[] =k*m+b simple fork\n");
@@ -340,8 +340,8 @@ int main(void)
                         ptrtimer_stop(t0);
                 }
                 printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n",i, rep,
-                        (double)i / ptrtimer_getavg(t0) * 1.0 / 1000000.0,
-                        (double)i / ptrtimer_getavg(t0) * 2 * sizeof(float) / 1000000.0);
+                        (double)i / ptrtimer_getavg(t0) * 2.0 / 1000000.0,
+                        (double)i / ptrtimer_getavg(t0) * 1 * sizeof(float) / 1000000.0);
         }
         
         printf("a[] *= m single thread\n");
@@ -547,11 +547,11 @@ int main(void)
                 
                 }
                 printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n",i, rep,
-                        (double)i / ptrtimer_getavg(t0) * 2.0 / 1000000.0,
-                        (double)i / ptrtimer_getavg(t0) * 2 * sizeof(float) / 1000000.0);
+                        (double)i / ptrtimer_getavg(t0) * 1.0 / 1000000.0,
+                        (double)i / ptrtimer_getavg(t0) * 3 * sizeof(float) / 1000000.0);
         }
 
-                printf("x[] = a[]*b[]\n");
+        printf("x[] = a[]*b[]+x[]\n");
         for (i = loopmin; i<loopsize; i = i<<1) {
                 ptrtimer_reset(t0);
                 rep = loopsize /i;
@@ -581,7 +581,7 @@ int main(void)
                 }
                 printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n",i, rep,
                         (double)i / ptrtimer_getavg(t0) * 2.0 / 1000000.0,
-                        (double)i / ptrtimer_getavg(t0) * 2 * sizeof(float) / 1000000.0);
+                        (double)i / ptrtimer_getavg(t0) * 4.0 * sizeof(float) / 1000000.0);
         }
         
         
