@@ -242,6 +242,7 @@ int main(void)
         printf("a[] = (float)k single thread\n");
         for (i = loopmin; i<loopsize; i = i<<1) {
                 ptrtimer_reset(t0);
+                rep = loopsize /i;
                 if (loopsize / i > 10000)
                     rep = 10000;
                 for (j = 0; j < rep; j++) {
@@ -260,6 +261,7 @@ int main(void)
         printf("a[] = (float)k*m single thread\n");
         for (i = loopmin; i<loopsize; i = i<<1) {
                 ptrtimer_reset(t0);
+                rep = loopsize /i;
                 if (loopsize / i > 10000)
                     rep = 10000;
                 for (j = 0; j < rep; j++) {
@@ -278,6 +280,7 @@ int main(void)
         printf("a[] = (float)k*m+b single thread\n");
         for (i = loopmin; i<loopsize; i = i<<1) {
                 ptrtimer_reset(t0);
+                rep = loopsize /i;
                 if (loopsize / i > 10000)
                     rep = 10000;
                 for (j = 0; j < rep; j++) {
@@ -296,6 +299,7 @@ int main(void)
         printf("a[] =(float)k*m+b simple fork\n");
         for (i = loopmin; i<loopsize; i = i<<1) {
                 ptrtimer_reset(t0);
+                rep = loopsize /i;
                 if (loopsize / i > 10000)
                     rep = 10000;
                 for (j = 0; j < rep; j++) {
@@ -319,6 +323,7 @@ int main(void)
         printf("a[] =k*m+b simple fork\n");
         for (i = loopmin; i<loopsize; i = i<<1) {
                 ptrtimer_reset(t0);
+                rep = loopsize /i;
                 if (loopsize / i > 10000)
                     rep = 10000;
                 for (j = 0; j < rep; j++) {
@@ -342,6 +347,7 @@ int main(void)
         printf("a[] *= m single thread\n");
         for (i = loopmin; i<loopsize; i = i<<1) {
                 ptrtimer_reset(t0);
+                rep = loopsize /i;
                 if (loopsize / i > 10000)
                     rep = 10000;
                 for (j = 0; j < rep; j++) {
@@ -360,6 +366,7 @@ int main(void)
         printf("a[] *= m simple fork\n");
         for (i = loopmin; i<loopsize; i = i<<1) {
                 ptrtimer_reset(t0);
+                rep = loopsize /i;
                 if (loopsize / i > 10000)
                     rep = 10000;
                 for (j = 0; j < rep; j++) {
@@ -383,6 +390,7 @@ int main(void)
         printf("a[] *= m cond wait\n");
         for (i = loopmin; i<loopsize; i = i<<1) {
                 ptrtimer_reset(t0);
+                rep = loopsize /i;
                 if (loopsize / i > 10000)
                     rep = 10000;
                 for (j = 0; j < rep; j++) {
@@ -422,6 +430,7 @@ int main(void)
         printf("a[] *= m barrier\n");
         for (i = loopmin; i<loopsize; i = i<<1) {
                 ptrtimer_reset(t0);
+                rep = loopsize /i;
                 if (loopsize / i > 10000)
                     rep = 10000;
                 for (j = 0; j < rep; j++) {
@@ -452,6 +461,7 @@ int main(void)
         printf("a[] += m\n");
         for (i = loopmin; i<loopsize; i = i<<1) {
                 ptrtimer_reset(t0);
+                rep = loopsize /i;
                 if (loopsize / i > 10000)
                     rep = 10000;
                 for (j = 0; j < rep; j++) {
@@ -481,6 +491,7 @@ int main(void)
         printf("a[] = a[]*m+b\n");
         for (i = loopmin; i<loopsize; i = i<<1) {
                 ptrtimer_reset(t0);
+                rep = loopsize /i;
                 if (loopsize / i > 10000)
                     rep = 10000;
                 for (j = 0; j < rep; j++) {
@@ -510,6 +521,7 @@ int main(void)
         printf("x[] = a[]*b[]\n");
         for (i = loopmin; i<loopsize; i = i<<1) {
                 ptrtimer_reset(t0);
+                rep = loopsize /i;
                 if (loopsize / i > 10000)
                     rep = 10000;
                 for (j = 0; j < rep; j++) {
@@ -540,6 +552,7 @@ int main(void)
                 printf("x[] = a[]*b[]\n");
         for (i = loopmin; i<loopsize; i = i<<1) {
                 ptrtimer_reset(t0);
+                rep = loopsize /i;
                 if (loopsize / i > 10000)
                     rep = 10000;
                 for (j = 0; j < rep; j++) {
