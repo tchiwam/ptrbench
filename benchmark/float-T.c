@@ -5,25 +5,67 @@
 #include<pthread.h>
 #include <sys/sysinfo.h>
 
-#define TOTALSIZE 65536000000
+#include <unistd.h>
+
+/* How big are we doing for the tests*/
+#define TOTALSIZE 6553600000
 // 1k=10 2k=11 4k=12 8k=13 16k=14 32k=15 64k=16 128k=17 256k=18 512k=19 
 // 1M=20 2M=21 4M=22 8M=23 16M=24 32M=25 64M=26 128M=27 256M=28 512M=29 
 // 1G=30 ...
 #define LOOPMIN 16 
-#define LOOPMAX 35
+#define LOOPMAX 30
+
+
+
+/* Here we have thread management */
 #define THREADMIN 1
 #define THREADMAX 8
-
 
 pthread_barrier_t   barrier1;
 pthread_barrier_t   barrier2;
 
+int                 waitvar = 0;
+pthread_cond_t      cond  = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t     mutex = PTHREAD_MUTEX_INITIALIZER;
 
 struct thread_args {
         float *x;
         unsigned long start;
         unsigned long stop;
 };
+
+/* Math kernels*/
+
+/*  x[k] *= n  */
+void *out1in1flop1mul_simple(void *function_args)
+{
+    float            *x = ((struct thread_args*)function_args)->x;
+    unsigned long start = ((struct thread_args*)function_args)->start;
+    unsigned long stop  = ((struct thread_args*)function_args)->stop;
+    for(; start < stop; start++) {
+                x[start] *= 1.07;          
+        
+    }
+}
+
+/*  x[k] *= n  */
+void *out1in1flop1mul_cond(void *function_args)
+{
+    float            *x = ((struct thread_args*)function_args)->x;
+    unsigned long start = ((struct thread_args*)function_args)->start;
+    unsigned long stop  = ((struct thread_args*)function_args)->stop;
+//     printf("Thread lock\n");
+    pthread_mutex_lock(&mutex);
+//     printf("Thread Wait\n");
+    while(waitvar == 0)
+        pthread_cond_wait(&cond,&mutex);
+//     printf("Thread unlock\n");
+    pthread_mutex_unlock(&mutex);
+//     printf("Thread Going\n");
+    for(; start < stop; start++) {
+                x[start] *= 1.07;          
+        }
+}
 
 /*  x[k] *= n  */
 void *out1in1flop1mul(void *function_args)
@@ -65,6 +107,10 @@ void *out1in1flop1mul1add(void *function_args)
     pthread_barrier_wait (&barrier2);
 }
 
+
+
+
+/* And where we start everything */
 int main(void)
 {
         // Generic variables
@@ -112,8 +158,83 @@ int main(void)
         }
         ptrtimer_stop(t0);
         ptrtimer_report(t0);
+
+        printf("a[] *= m single thread\n");
+        for (i = loopmin; i<loopsize; i = i<<1) {
+                ptrtimer_reset(t0);
+                for (j = 0; j < loopsize / i; j++) {
+                        (function_args[0])->x = x;
+                        (function_args[0])->start = 0;
+                        (function_args[0])->stop  = i;
+                        ptrtimer_start(t0);
+                        out1in1flop1mul_simple((void *)(function_args[0]));
+                        ptrtimer_stop(t0);                     
+                }
+                printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n",i, loopsize/i,
+                        (double)i / ptrtimer_getavg(t0) * 1.0 / 1000000.0,
+                        (double)i / ptrtimer_getavg(t0) * 2 * sizeof(float) / 1000000.0);
+        }
+
+        printf("a[] *= m simple fork\n");
+        for (i = loopmin; i<loopsize; i = i<<1) {
+                ptrtimer_reset(t0);
+                for (j = 0; j < loopsize / i; j++) {
+                        for(k = 0; k < Nthreads; k++) {
+                                (function_args[k])->x = x;
+                                (function_args[k])->start = (i/Nthreads)*k;
+                                (function_args[k])->stop  = (i/Nthreads)*(k+1);
+                        }
+                        ptrtimer_start(t0);
+                        for(k = 0; k < Nthreads; k++)
+                                pthread_create(&(tid[k]),NULL,out1in1flop1mul_simple,(void *)(function_args[k]));
+                        for(k = 0; k < Nthreads; k++)
+                                pthread_join(tid[k],NULL);
+                        ptrtimer_stop(t0);
+                }
+                printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n",i, loopsize/i,
+                        (double)i / ptrtimer_getavg(t0) * 1.0 / 1000000.0,
+                        (double)i / ptrtimer_getavg(t0) * 2 * sizeof(float) / 1000000.0);
+        }
+
+        printf("a[] *= m cond wait\n");
+        for (i = loopmin; i<loopsize; i = i<<1) {
+                ptrtimer_reset(t0);
         
-        printf("a[] *= m\n");
+                for (j = 0; j < loopsize / i; j++) {
+                        pthread_mutex_init(&mutex, NULL);
+                        pthread_cond_init(&cond, NULL);
+                        waitvar = 0;
+                        for(k = 0; k < Nthreads; k++) {
+                                (function_args[k])->x = x;
+                                (function_args[k])->start = (i/Nthreads)*k;
+                                (function_args[k])->stop  = (i/Nthreads)*(k+1);
+                        }
+//                         printf("Thread create\n");
+//                         printf("Main lock\n");
+                        pthread_mutex_lock(&mutex);
+                        for(k = 0; k < Nthreads; k++)
+                                pthread_create(&(tid[k]),NULL,out1in1flop1mul_cond,(void *)(function_args[k]));
+                        
+                        waitvar = 1;                        
+                        //usleep(10000);
+                        ptrtimer_start(t0);
+//                         printf("Main Broadcast\n");
+                        pthread_cond_broadcast(&cond);
+//                         printf("Main unlock\n");
+                        pthread_mutex_unlock(&mutex); 
+//                         printf("Main join\n");
+                        for(k = 0; k < Nthreads; k++)
+                                pthread_join(tid[k],NULL);
+                        ptrtimer_stop(t0);                        
+                        pthread_cond_destroy(&cond);
+                        pthread_mutex_destroy(&mutex);
+                }
+                printf("size=%ld rep=%ld Mflop/s=%4.3f MByte/s=%4.3f \n",i, loopsize/i,
+                        (double)i / ptrtimer_getavg(t0) * 1.0 / 1000000.0,
+                        (double)i / ptrtimer_getavg(t0) * 2 * sizeof(float) / 1000000.0);
+        }
+
+        printf("a[] *= m barrier\n");
         for (i = loopmin; i<loopsize; i = i<<1) {
                 ptrtimer_reset(t0);
                 for (j = 0; j < loopsize / i; j++) {

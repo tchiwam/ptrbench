@@ -30,9 +30,19 @@ include_directories("${PROJECT_BINARY_DIR}"
                     "${PROJECT_SOURCE_DIR}/include")
 
 add_executable(benchfloat benchmark/float.c)
-add_executable(benchcast  benchmark/cast.c)
 target_link_libraries(benchfloat ptrtimer)
+
+add_executable(benchcast  benchmark/cast.c)
 target_link_libraries(benchcast ptrtimer)
+
+find_library(PTHREAD_LIB pthread)
+if(PTHREAD_LIB)
+    message("pthread library found")
+    add_executable(benchfloatT benchmark/float-T.c)
+    target_link_libraries(benchfloatT pthread ptrtimer)
+else()
+    message("pthread library not found")
+endif()
 
 find_library(FFTW3F_LIB fftw3f)
 if(FFTW3F_LIB)
