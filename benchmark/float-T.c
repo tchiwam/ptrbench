@@ -210,7 +210,7 @@ int main(void)
         unsigned long loopsize;
         
         /*Multi threading stuff here*/
-        unsigned long Nthreads = 8;
+        unsigned long Nthreads = 4;
         struct thread_args **function_args = (struct thread_args **)malloc(sizeof(struct thread_args*)*Nthreads);
         for(k = 0; k < Nthreads; k++)
             function_args[k] = (struct thread_args *)malloc(sizeof(struct thread_args));
