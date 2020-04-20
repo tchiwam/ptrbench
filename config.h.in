@@ -3,4 +3,5 @@
 #define ptrbench_C_COMPILER_ID @ptrbench_C_COMPILER_ID@
 #define ptrbench_C_COMPILER_VERSION @ptrbench_C_COMPILER_VERSION@
 #define ptrbench_CFLAGS @ptrbench_CFLAGS@
+#define ptrbench_NUMA @ptrbench_NUMA@
 
