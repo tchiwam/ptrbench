@@ -528,6 +528,8 @@ int main(void)
                         pthread_barrier_init (&barrier1, NULL, Nthreads+1);
                         pthread_barrier_init (&barrier2, NULL, Nthreads+1);
                         for(k = 0; k < Nthreads; k++) {
+                                (function_args[k])->a = a;
+                                (function_args[k])->b = b;
                                 (function_args[k])->x = x;
                                 (function_args[k])->start = (i/Nthreads)*k;
                                 (function_args[k])->stop  = (i/Nthreads)*(k+1);
@@ -559,6 +561,8 @@ int main(void)
                         pthread_barrier_init (&barrier1, NULL, Nthreads+1);
                         pthread_barrier_init (&barrier2, NULL, Nthreads+1);
                         for(k = 0; k < Nthreads; k++) {
+                                (function_args[k])->a = a;
+                                (function_args[k])->b = b;
                                 (function_args[k])->x = x;
                                 (function_args[k])->start = (i/Nthreads)*k;
                                 (function_args[k])->stop  = (i/Nthreads)*(k+1);
