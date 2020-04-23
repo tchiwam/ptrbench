@@ -1,0 +1,62 @@
+Compiler GNU
+ Version 9.3.0
+ CFLAGS -Ofast -march=native -mfma -mavx -fprefetch-loop-arrays
+Total memory allocated 122 Mbytes 
+Loop size              30 Mfloats
+Adjusting loopsize to loopmax
+Loop min size          1024 floats
+Loop max size          32000000 floats
+Loading OpenCL
+Platform information
+Num platforms 1
+clCreateCommandQueueWithProperties 0
+Create program with source
+a[] *= m
+size=1024 rep=31250 Mflop/s=30.790 MByte/s=246.323 
+size=2048 rep=15625 Mflop/s=53.332 MByte/s=426.652 
+size=4096 rep=7812 Mflop/s=110.263 MByte/s=882.103 
+size=8192 rep=3906 Mflop/s=286.513 MByte/s=2292.100 
+size=16384 rep=1953 Mflop/s=583.951 MByte/s=4671.605 
+size=32768 rep=976 Mflop/s=1083.007 MByte/s=8664.055 
+size=65536 rep=488 Mflop/s=1882.933 MByte/s=15063.468 
+size=131072 rep=244 Mflop/s=3483.427 MByte/s=27867.418 
+size=262144 rep=122 Mflop/s=7014.397 MByte/s=56115.176 
+size=524288 rep=61 Mflop/s=12300.031 MByte/s=98400.245 
+size=1048576 rep=30 Mflop/s=19492.809 MByte/s=155942.468 
+size=2097152 rep=15 Mflop/s=26670.284 MByte/s=213362.272 
+size=4194304 rep=7 Mflop/s=31802.186 MByte/s=254417.489 
+size=8388608 rep=3 Mflop/s=35881.106 MByte/s=287048.852 
+size=16777216 rep=1 Mflop/s=38630.477 MByte/s=309043.813 
+a[] += b
+size=1024 rep=31250 Mflop/s=27.565 MByte/s=220.519 
+size=2048 rep=15625 Mflop/s=50.001 MByte/s=400.006 
+size=4096 rep=7812 Mflop/s=98.932 MByte/s=791.454 
+size=8192 rep=3906 Mflop/s=174.818 MByte/s=1398.545 
+size=16384 rep=1953 Mflop/s=380.288 MByte/s=3042.307 
+size=32768 rep=976 Mflop/s=744.419 MByte/s=5955.353 
+size=65536 rep=488 Mflop/s=1397.556 MByte/s=11180.447 
+size=131072 rep=244 Mflop/s=2251.931 MByte/s=18015.445 
+size=262144 rep=122 Mflop/s=5632.447 MByte/s=45059.574 
+size=524288 rep=61 Mflop/s=9437.212 MByte/s=75497.692 
+size=1048576 rep=30 Mflop/s=13873.093 MByte/s=110984.744 
+size=2097152 rep=15 Mflop/s=17873.130 MByte/s=142985.037 
+size=4194304 rep=7 Mflop/s=21211.023 MByte/s=169688.182 
+size=8388608 rep=3 Mflop/s=22246.288 MByte/s=177970.303 
+size=16777216 rep=1 Mflop/s=23635.974 MByte/s=189087.790 
+a[] = a[]*m+b
+size=1024 rep=31250 Mflop/s=50.573 MByte/s=202.292 
+size=2048 rep=15625 Mflop/s=97.746 MByte/s=390.985 
+size=4096 rep=7812 Mflop/s=197.947 MByte/s=791.790 
+size=8192 rep=3906 Mflop/s=401.576 MByte/s=1606.305 
+size=16384 rep=1953 Mflop/s=813.051 MByte/s=3252.205 
+size=32768 rep=976 Mflop/s=1496.563 MByte/s=5986.251 
+size=65536 rep=488 Mflop/s=2803.009 MByte/s=11212.036 
+size=131072 rep=244 Mflop/s=4560.593 MByte/s=18242.373 
+size=262144 rep=122 Mflop/s=7874.888 MByte/s=31499.550 
+size=524288 rep=61 Mflop/s=13683.330 MByte/s=54733.319 
+size=1048576 rep=30 Mflop/s=27721.625 MByte/s=110886.499 
+size=2097152 rep=15 Mflop/s=36053.342 MByte/s=144213.368 
+size=4194304 rep=7 Mflop/s=41716.490 MByte/s=166865.959 
+size=8388608 rep=3 Mflop/s=43979.012 MByte/s=175916.047 
+size=16777216 rep=1 Mflop/s=46549.910 MByte/s=186199.640 
+Freeing all
